@@ -1,0 +1,3 @@
+.codebase-memory/
+*.tgz
+node_modules/
