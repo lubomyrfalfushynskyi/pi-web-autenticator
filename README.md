@@ -76,8 +76,12 @@ const checked = await validator.check({ username, realm, pass: otpOrPin });
 creating a challenge for an unrelated factor and damaging its failure counter.
 
 Before issuing a site session after `complete()` returns `ACCEPT`, the host
-must verify that the returned token serial and type match the server-held
-pending-login mapping. A missing or mismatched value is a failed login.
+must verify that the returned token serial matches the server-held
+pending-login mapping. If privacyIDEA returns a token type, it must also match
+the server-held mapping. Some successful challenge responses omit `type`, so
+the host must retain the type selected at `begin()` rather than infer it from
+the final response. A missing or mismatched serial, or a mismatched supplied
+type, is a failed login.
 
 ## Verification
 

@@ -127,6 +127,21 @@ test('malformed signature is rejected without a request', async () => {
   assert.equal(calls, 0);
 });
 
+test('successful challenge response keeps serial when PI omits type', async () => {
+  const provider = createChallengeResponseProvider({
+    tokenProfile: profile('avtorcc338'),
+    request: async () => ({
+      ok: true,
+      body: { result: { status: true, value: true }, detail: { serial: SERIAL } },
+    }),
+  });
+  const result = await provider.complete({ username: 'user', realm: 'realm',
+    transactionId: 'tx-123', signatureHex: 'deadbeef' });
+  assert.equal(result.kind, KINDS.ACCEPT);
+  assert.equal(result.serial, SERIAL);
+  assert.equal(result.type, null);
+});
+
 test('HTTP transport keeps PI API key on the backend request', async () => {
   let captured;
   const transport = createPrivacyIdeaTransport({

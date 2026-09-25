@@ -49,9 +49,11 @@ begin(identity)
 
 The host must not accept a client-supplied transaction ID. It must compare the
 returned serial with the server-side identity mapping before exposing the
-challenge. After `complete()` returns `ACCEPT`, it must compare both the
-returned `serial` and `type` with the pending login's server-held token
-mapping before creating a site session. Missing or mismatched values fail
+challenge. After `complete()` returns `ACCEPT`, it must require the returned
+`serial` to match the pending login's server-held token mapping. If PI supplies
+`type`, it must match the server-held type too; a missing `type` is normal for
+some successful challenge responses and must not replace the type pinned at
+`begin()`. Missing or mismatched serials and mismatched supplied types fail
 closed. The browser must never receive the PI URL or API key.
 
 ## Profile extension
@@ -69,7 +71,8 @@ Each host integration must test:
 - valid and invalid challenge signatures;
 - missing and stale serial mappings;
 - wrong returned serial;
-- missing or wrong accepted serial/type before session issuance;
+- missing or wrong accepted serial, and wrong supplied type before session issuance;
+- accepted response without `type`, with type retained from the pending mapping;
 - missing transaction ID;
 - privacyIDEA timeout and API rejection;
 - token wake/reinitialization on the local agent;
