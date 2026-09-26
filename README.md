@@ -1,5 +1,11 @@
 # pi-site-backend-2fa-module
 
+**Installation sequence:** Stage 3 — install the server-side site adapter,
+after privacyIDEA and the required token type are available. For the complete
+order, prerequisites, and troubleshooting, see
+[`docs/installation-sequence.uk.md`](docs/installation-sequence.uk.md).
+Українська документація: [`README.uk.md`](README.uk.md).
+
 Server-side adapter for privacyIDEA authentication in web applications. The
 package deliberately does not expose an HTTP endpoint and does not contain
 browser code: each site retains its own login policy, session issuance,
@@ -100,7 +106,7 @@ site backend must own those parts and follow
 [`docs/integration-contract.md`](docs/integration-contract.md).
 
 For InTrack, the reviewed archive is vendored at
-`backend/vendor/pi-site-backend-2fa-module-0.2.2.tgz` and pinned in
+`backend/vendor/pi-site-backend-2fa-module-0.2.3.tgz` and pinned in
 `backend/package.json`. To update it from a module checkout:
 
 ```sh

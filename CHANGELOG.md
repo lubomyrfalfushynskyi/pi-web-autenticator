@@ -1,0 +1,8 @@
+# Changelog
+
+## 0.2.3
+
+- Added Ukrainian README and integration-contract translations.
+- Added the Ukrainian end-to-end installation sequence, stage prerequisites,
+  expected outcomes, and troubleshooting guide.
+- No runtime API or authentication behavior changed from 0.2.2.
