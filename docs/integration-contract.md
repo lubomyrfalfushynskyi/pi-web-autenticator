@@ -14,6 +14,15 @@ The host site owns:
 This package owns only the server-side PI request/response contract. It never
 receives a browser request directly and never makes a session decision.
 
+## Install and release
+
+The module is distributed as a versioned npm package/archive. For InTrack, the
+approved `.tgz` lives in `backend/vendor/`, and `backend/package.json` pins its
+exact filename. Build the backend from its own Docker context after updating
+the archive and dependency. Verify the running version inside the backend
+container before accepting the rollout. The package does not add routes or UI;
+the host application implements the flow below.
+
 ## Standard PI token
 
 Use `createValidationProvider()` when the token expects a value in `pass`:

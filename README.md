@@ -91,3 +91,36 @@ On 2026-09-19, an InTrack integration was also tested against a privacyIDEA
 instance with a real CC338 token and with TOTP: valid responses issued a site
 session; invalid responses did not. The host's domain-account mapping and OS
 login are separate integrations, not functions of this package.
+
+## Install in a site backend
+
+This repository is a server-side npm package. It does not install a login
+screen, HTTP endpoint, admin page, user mapping, or OS login by itself. The
+site backend must own those parts and follow
+[`docs/integration-contract.md`](docs/integration-contract.md).
+
+For InTrack, the reviewed archive is vendored at
+`backend/vendor/pi-site-backend-2fa-module-0.2.2.tgz` and pinned in
+`backend/package.json`. To update it from a module checkout:
+
+```sh
+npm pack --pack-destination /path/to/InTrack/backend/vendor
+```
+
+Update the `file:vendor/pi-site-backend-2fa-module-X.Y.Z.tgz` dependency in
+`backend/package.json`, then install and rebuild from the InTrack checkout:
+
+```sh
+cd /path/to/InTrack
+npm install
+docker compose build backend
+docker compose up -d --no-deps backend
+docker exec intrack-backend node -p "require('pi-site-backend-2fa-module/package.json').version"
+```
+
+The final command must print the pinned package version. Keep the archive in
+`backend/vendor/`, inside the backend Docker build context. For another site,
+install the archive with that site's package manager and implement its routes,
+pending-login storage, session issuance, identity mapping, and enrollment UI
+separately. Never expose privacyIDEA credentials or transaction IDs to a
+browser.
