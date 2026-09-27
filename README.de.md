@@ -48,6 +48,13 @@ Für InTrack wird das versionierte npm-Archiv in `backend/vendor/` abgelegt
 und in `backend/package.json` exakt festgeschrieben. Erstellen des Archivs:
 
 Dieses Paket ist eine Bibliothek, kein eigenständiger Container oder Dienst.
+`transport.diagnose()` sendet eine unauthentifizierte `GET`-Anfrage an den
+konfigurierten Origin und prüft DNS/TLS/HTTP. Es ruft keinen
+Validierungsendpunkt auf und sendet keinen API-Schlüssel. HTTP 5xx gilt als
+nicht erreichbar. Dies bestätigt weder API-Schlüssel, Token-Plugin-Registrierung
+noch eine erfolgreiche Authentifizierung. `validatePrivacyIdeaConfig()` prüft
+die lokale Konfiguration ohne Netzwerkzugriff.
+Aktuelle Paketversion: `0.3.0`.
 Es muss in das Backend-Image der Website aufgenommen werden. Offene
 Login-Challenges und ihre `transaction_id` müssen mit begrenzter TTL im
 serverseitigen Speicher der Website liegen, nicht nur im Prozessspeicher

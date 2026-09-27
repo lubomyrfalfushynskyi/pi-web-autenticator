@@ -1,5 +1,5 @@
 PI-SITE-BACKEND-2FA-MODULE — КОРОТКЕ РОЗГОРТАННЯ
-Версія пакета: 0.2.5
+Версія пакета: 0.3.0
 Місце в наскрізній установці: етап 3 (backend сайту)
 
 ПЕРЕДУМОВИ
@@ -18,7 +18,7 @@ PI-SITE-BACKEND-2FA-MODULE — КОРОТКЕ РОЗГОРТАННЯ
   npm pack --pack-destination /шлях/до/InTrack/backend/vendor
 
 У backend/package.json InTrack зафіксувати точну локальну залежність:
-  file:vendor/pi-site-backend-2fa-module-0.2.5.tgz
+  file:vendor/pi-site-backend-2fa-module-0.3.0.tgz
 
 ПОСТІЙНА РОБОТА В КОНТЕЙНЕРІ
 Цей npm-пакет сам не є сервісом і не запускається окремим контейнером.
@@ -50,7 +50,7 @@ upgrade з очікуванням безперервного MFA; спершу �
   docker compose up -d --no-deps backend
   docker exec intrack-backend node -p "require('pi-site-backend-2fa-module/package.json').version"
 
-Остання команда має вивести 0.2.5. Перевірити health сайту та позитивний і
+Остання команда має вивести 0.3.0. Перевірити health сайту та позитивний і
 негативний OTP/challenge-response сценарії. Для цього оновлення не
 перезбирати й не перезапускати базу даних.
 

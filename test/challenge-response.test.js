@@ -11,6 +11,7 @@ const {
   defineProfile,
   profile,
   profiles,
+  validatePrivacyIdeaConfig,
 } = require('../src');
 
 const SERIAL = 'P11C0000TEST';
@@ -173,4 +174,42 @@ test('HTTP transport opens a circuit after repeated network failures', async () 
   assert.equal(blocked.kind, KINDS.UNAVAILABLE);
   assert.equal(calls, 2);
   assert.equal(transport.breakerState().open, true);
+});
+
+test('transport diagnosis checks only the origin and never sends the PI key or validation request', async () => {
+  const calls = [];
+  const transport = createPrivacyIdeaTransport({
+    baseUrl: 'https://pi.example/', apiKey: 'secret', apiKeyMode: 'required',
+    fetchImpl: async (url, options) => {
+      calls.push({ url, options });
+      return { status: 401 };
+    },
+  });
+  assert.deepEqual(await transport.diagnose(), {
+    configured: true, reachable: true, http_status: 401, issues: [],
+  });
+  assert.equal(calls.length, 1);
+  assert.equal(calls[0].url, 'https://pi.example/');
+  assert.equal(calls[0].options.method, 'GET');
+  assert.equal(calls[0].options.headers, undefined);
+  assert.equal(validatePrivacyIdeaConfig({ baseUrl: 'https://pi.example', apiKeyMode: 'required' }).valid, false);
+  assert.equal(validatePrivacyIdeaConfig({ baseUrl: 'https://pi.example', apiKey: 'x', apiKeyMode: 'required' }).valid, true);
+  assert.equal(validatePrivacyIdeaConfig({ baseUrl: 'https://user:pass@pi.example' }).valid, false);
+  assert.throws(() => createPrivacyIdeaTransport({ baseUrl: 'https://user:pass@pi.example' }), /вбудовані облікові дані/);
+});
+
+test('transport diagnosis distinguishes server errors and network failures', async () => {
+  const serverError = createPrivacyIdeaTransport({
+    baseUrl: 'https://pi.example',
+    fetchImpl: async () => ({ status: 503 }),
+  });
+  assert.equal((await serverError.diagnose()).reachable, false);
+
+  const offline = createPrivacyIdeaTransport({
+    baseUrl: 'https://pi.example',
+    fetchImpl: async () => { throw new Error('sensitive transport detail'); },
+  });
+  const result = await offline.diagnose();
+  assert.equal(result.reachable, false);
+  assert.doesNotMatch(JSON.stringify(result), /sensitive transport detail/);
 });

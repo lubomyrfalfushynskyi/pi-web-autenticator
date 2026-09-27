@@ -40,6 +40,13 @@ TLS trust, timeout, circuit breaker and API-key policy in the application that
 owns them. `createPrivacyIdeaTransport()` is included for sites that do not
 already have this transport.
 
+`transport.diagnose()` performs an unauthenticated `GET` to the configured
+origin to check DNS/TLS/HTTP reachability; it never calls a validation route
+or sends the API key. HTTP 5xx is reported as unreachable. This does not prove
+API-key validity, token-plugin registration, or successful authentication.
+`validatePrivacyIdeaConfig()` checks local settings without network access.
+The package version for this API is `0.3.0`.
+
 The package also exposes `createValidationProvider()` for ordinary privacyIDEA
 token types. It sends the site-provided `pass` value through the same server
 transport and classifies `ACCEPT`, `REJECT`, missing-token and configuration

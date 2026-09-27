@@ -91,6 +91,21 @@ function responseError(body) {
   return { kind: result.error.code === 904 ? KINDS.UNKNOWN_USER : KINDS.MISCONFIGURED, message };
 }
 
+/** Validate non-secret transport settings without making a network request. */
+function validatePrivacyIdeaConfig({ baseUrl, apiKey = '', apiKeyMode = 'none', timeoutMs = 5000 } = {}) {
+  const issues = [];
+  let parsed;
+  try { parsed = new URL(String(baseUrl || '')); } catch { issues.push('baseUrl must be an absolute URL'); }
+  if (parsed && !['http:', 'https:'].includes(parsed.protocol)) issues.push('baseUrl must use HTTP or HTTPS');
+  if (parsed && (parsed.username || parsed.password)) issues.push('baseUrl must not contain embedded credentials');
+  if (apiKeyMode !== 'none' && apiKeyMode !== 'optional' && apiKeyMode !== 'required') {
+    issues.push('apiKeyMode must be none, optional or required');
+  }
+  if (apiKeyMode === 'required' && !apiKey) issues.push('apiKey is required by apiKeyMode');
+  if (!Number.isFinite(timeoutMs) || timeoutMs <= 0) issues.push('timeoutMs must be a positive number');
+  return Object.freeze({ valid: issues.length === 0, issues: Object.freeze(issues) });
+}
+
 function extractChallenge(body, tokenProfile) {
   const detail = body && body.detail ? body.detail : {};
   const entries = Array.isArray(detail.multi_challenge) ? detail.multi_challenge : [];
@@ -143,11 +158,35 @@ function createPrivacyIdeaTransport({
 }) {
   const base = String(baseUrl || '').replace(/\/+$/, '');
   if (!base) throw new TypeError('baseUrl privacyIDEA обовʼязковий');
+  const parsedBase = new URL(base);
+  if (parsedBase.username || parsedBase.password) {
+    throw new TypeError('baseUrl не має містити вбудовані облікові дані');
+  }
   if (typeof fetchImpl !== 'function') throw new TypeError('fetchImpl має бути функцією');
   if (!['none', 'optional', 'required'].includes(apiKeyMode)) throw new TypeError('apiKeyMode має бути none, optional або required');
   if (!Number.isFinite(timeoutMs) || timeoutMs <= 0) throw new TypeError('timeoutMs має бути додатним числом');
 
   const breaker = { failures: 0, openedAt: null };
+  async function diagnose() {
+    const config = validatePrivacyIdeaConfig({ baseUrl: base, apiKey, apiKeyMode, timeoutMs });
+    if (!config.valid) return { configured: false, reachable: null, issues: [...config.issues] };
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      // An unauthenticated GET to the configured origin checks DNS/TLS/HTTP
+      // only. It never invokes a validation endpoint or sends the API key.
+      const response = await fetchImpl(`${base}/`, { method: 'GET', signal: controller.signal });
+      return { configured: true, reachable: response.status < 500, http_status: response.status, issues: [] };
+    } catch (error) {
+      return {
+        configured: true,
+        reachable: false,
+        issues: [error && error.name === 'AbortError' ? 'Connection check timed out' : 'privacyIDEA origin could not be reached'],
+      };
+    } finally {
+      clearTimeout(timer);
+    }
+  }
   const state = (now = Date.now()) => {
     const cooldownMs = breakerCooldownSec * 1000;
     if (breaker.openedAt && now - breaker.openedAt >= cooldownMs) {
@@ -213,7 +252,7 @@ function createPrivacyIdeaTransport({
     }
   }
 
-  return Object.freeze({ request, breakerState: state });
+  return Object.freeze({ request, breakerState: state, diagnose });
 }
 
 /**
@@ -287,4 +326,5 @@ module.exports = {
   profile,
   profiles,
   validSignature,
+  validatePrivacyIdeaConfig,
 };
