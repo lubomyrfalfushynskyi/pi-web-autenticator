@@ -1,5 +1,5 @@
 PI-SITE-BACKEND-2FA-MODULE — КОРОТКЕ РОЗГОРТАННЯ
-Версія пакета: 0.2.4
+Версія пакета: 0.2.5
 Місце в наскрізній установці: етап 3 (backend сайту)
 
 ПЕРЕДУМОВИ
@@ -18,7 +18,31 @@ PI-SITE-BACKEND-2FA-MODULE — КОРОТКЕ РОЗГОРТАННЯ
   npm pack --pack-destination /шлях/до/InTrack/backend/vendor
 
 У backend/package.json InTrack зафіксувати точну локальну залежність:
-  file:vendor/pi-site-backend-2fa-module-0.2.4.tgz
+  file:vendor/pi-site-backend-2fa-module-0.2.5.tgz
+
+ПОСТІЙНА РОБОТА В КОНТЕЙНЕРІ
+Цей npm-пакет сам не є сервісом і не запускається окремим контейнером.
+Його треба включити у backend image хост-сайту; не монтувати вихідний код із
+робочої директорії в довготривалий контейнер. Зафіксуйте точну версію пакета
+і dependency lockfile, включіть tgz до Docker build context, перебудуйте
+backend image і замініть лише backend-сервіс.
+
+Для InTrack виконайте команди з розділу нижче. Після оновлення перевірте
+версію зсередини запущеного контейнера, health endpoint і позитивний та
+негативний фактор. Сайт має зберігати незавершений challenge/transaction ID
+у серверному сховищі з обмеженим TTL; не тримати його лише в пам'яті процесу
+якщо можливі рестарти або кілька backend replicas. Сам модуль не керує
+контейнерами, persistent storage, health checks чи сесіями.
+
+Важливо для поточного InTrack: його MFA challenge і PI transaction ID наразі
+зберігаються в пам'яті одного backend процесу. Перезапуск скасовує активний
+MFA-вхід, а кілька replicas не підтримуються цим потоком. Не робити rolling
+upgrade з очікуванням безперервного MFA; спершу потрібне окреме shared-store
+рішення з TTL.
+
+Відкат: повернути попередні archive/dependency lockfile з версіонованої
+резервної копії, перебудувати й замінити backend, перевірити версію та health.
+Не видаляти volumes БД/сесій під час відкоту бібліотеки.
 
 З кореня репозиторію InTrack:
   npm install
@@ -26,7 +50,7 @@ PI-SITE-BACKEND-2FA-MODULE — КОРОТКЕ РОЗГОРТАННЯ
   docker compose up -d --no-deps backend
   docker exec intrack-backend node -p "require('pi-site-backend-2fa-module/package.json').version"
 
-Остання команда має вивести 0.2.4. Перевірити health сайту та позитивний і
+Остання команда має вивести 0.2.5. Перевірити health сайту та позитивний і
 негативний OTP/challenge-response сценарії. Для цього оновлення не
 перезбирати й не перезапускати базу даних.
 

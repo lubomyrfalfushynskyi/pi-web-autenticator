@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.5
+
+- Documented persistent container operation, host responsibilities, upgrade,
+  rollback, and current InTrack challenge-state limitations.
+- No runtime API or authentication behavior changed from 0.2.4.
+
 ## 0.2.4
 
 - Added a German README and a root-level quick deployment guide.

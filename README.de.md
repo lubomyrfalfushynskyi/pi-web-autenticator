@@ -47,6 +47,17 @@ zur Ablehnung.
 Für InTrack wird das versionierte npm-Archiv in `backend/vendor/` abgelegt
 und in `backend/package.json` exakt festgeschrieben. Erstellen des Archivs:
 
+Dieses Paket ist eine Bibliothek, kein eigenständiger Container oder Dienst.
+Es muss in das Backend-Image der Website aufgenommen werden. Offene
+Login-Challenges und ihre `transaction_id` müssen mit begrenzter TTL im
+serverseitigen Speicher der Website liegen, nicht nur im Prozessspeicher
+(wichtig bei Neustarts und mehreren Replikaten). Beim Update nur das Backend
+neu bauen und ersetzen. Volumes, Health-Checks, Sitzungen und Containerbetrieb
+verwaltet die Website, nicht dieses Paket.
+Bei der aktuellen InTrack-Implementierung liegen offene MFA-Challenges noch
+im Prozessspeicher: Ein Backend-Neustart verwirft laufende Logins; mehrere
+Backend-Replikate werden für MFA nicht unterstützt.
+
 ```sh
 npm pack --pack-destination /path/to/InTrack/backend/vendor
 ```

@@ -107,8 +107,17 @@ site backend must own those parts and follow
 [`docs/integration-contract.md`](docs/integration-contract.md).
 
 For InTrack, the reviewed archive is vendored at
-`backend/vendor/pi-site-backend-2fa-module-0.2.4.tgz` and pinned in
+`backend/vendor/pi-site-backend-2fa-module-0.2.5.tgz` and pinned in
 `backend/package.json`. To update it from a module checkout:
+
+The package is a library, not a standalone container/service. Include the
+version-pinned archive in the host backend image and persist pending login
+state in the host's server-side store (with a TTL); do not rely on process
+memory across restarts or replicas. Rebuild and replace only the backend
+service. The module does not manage volumes, health checks, sessions, or
+container lifecycle. In the current InTrack implementation, pending MFA
+challenges are still process-local: restarting its backend invalidates active
+logins, and multiple backend replicas are not supported for MFA.
 
 ```sh
 npm pack --pack-destination /path/to/InTrack/backend/vendor
