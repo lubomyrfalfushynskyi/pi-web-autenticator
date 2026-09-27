@@ -4,7 +4,8 @@
 after privacyIDEA and the required token type are available. For the complete
 order, prerequisites, and troubleshooting, see
 [`docs/installation-sequence.uk.md`](docs/installation-sequence.uk.md).
-Українська документація: [`README.uk.md`](README.uk.md).
+Languages: [Deutsch](README.de.md) · [Українська](README.uk.md).
+Quick deployment: [`DEPLOYMENT.txt`](DEPLOYMENT.txt).
 
 Server-side adapter for privacyIDEA authentication in web applications. The
 package deliberately does not expose an HTTP endpoint and does not contain
@@ -106,7 +107,7 @@ site backend must own those parts and follow
 [`docs/integration-contract.md`](docs/integration-contract.md).
 
 For InTrack, the reviewed archive is vendored at
-`backend/vendor/pi-site-backend-2fa-module-0.2.3.tgz` and pinned in
+`backend/vendor/pi-site-backend-2fa-module-0.2.4.tgz` and pinned in
 `backend/package.json`. To update it from a module checkout:
 
 ```sh

@@ -5,7 +5,8 @@
 зіставлення сайту з користувачем/токеном. Повна карта етапів, передумови,
 результати й усунення несправностей: [`docs/installation-sequence.uk.md`](docs/installation-sequence.uk.md).
 Контракт інтеграції: [`docs/integration-contract.uk.md`](docs/integration-contract.uk.md).
-English: [`README.md`](README.md).
+Мови: [Deutsch](README.de.md) · [English](README.md).
+Коротке розгортання: [`DEPLOYMENT.txt`](DEPLOYMENT.txt).
 
 ## Призначення
 
@@ -74,8 +75,8 @@ docker exec intrack-backend node -p "require('pi-site-backend-2fa-module/package
 стабільні коди (`accept`, `reject`, `no_token`, `unknown_user`,
 `misconfigured`, `unavailable`, `not_linked`); бібліотека не перекладає їх і
 не формує локалізовані написи. Сайт перетворює ці коди на повідомлення своєю
-системою локалізації. У репозиторії та npm-архіві доступні українська й
-англійська технічні інструкції.
+системою локалізації. У репозиторії та npm-архіві є технічні матеріали
+англійською, німецькою й українською.
 
 ## Перевірка
 

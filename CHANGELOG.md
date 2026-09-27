@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.4
+
+- Added a German README and a root-level quick deployment guide.
+- No runtime API or authentication behavior changed from 0.2.3.
+
 ## 0.2.3
 
 - Added Ukrainian README and integration-contract translations.

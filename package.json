@@ -1,11 +1,13 @@
 {
   "name": "pi-site-backend-2fa-module",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "Server-side privacyIDEA challenge-response adapter for web applications",
   "main": "src/index.js",
   "files": [
     "src/index.js",
     "CHANGELOG.md",
+    "DEPLOYMENT.txt",
+    "README.de.md",
     "README.uk.md",
     "docs/integration-contract.md",
     "docs/integration-contract.uk.md",

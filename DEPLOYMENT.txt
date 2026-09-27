@@ -1,0 +1,56 @@
+PI-SITE-BACKEND-2FA-MODULE — КОРОТКЕ РОЗГОРТАННЯ
+Версія пакета: 0.2.4
+Місце в наскрізній установці: етап 3 (backend сайту)
+
+ПЕРЕДУМОВИ
+1. Етап 1: privacyIDEA доступна backend сайту через перевірений TLS;
+   потрібний тип токена встановлено та зареєстровано.
+2. Етап 2: токен enrollment-нуто; site user зіставлений із правильним PI
+   user, realm/resolver і serial.
+3. Backend використовує Node.js 20+; є тестове середовище й процедура відкату.
+4. Сам сайт реалізує маршрути входу, збереження/строк pending login, видачу
+   сесії, identity mapping і аудит. Ця бібліотека цього не робить.
+
+ВСТАНОВЛЕННЯ В INTRACK
+У каталозі цього репозиторію:
+  npm test
+  npm run lint
+  npm pack --pack-destination /шлях/до/InTrack/backend/vendor
+
+У backend/package.json InTrack зафіксувати точну локальну залежність:
+  file:vendor/pi-site-backend-2fa-module-0.2.4.tgz
+
+З кореня репозиторію InTrack:
+  npm install
+  docker compose build backend
+  docker compose up -d --no-deps backend
+  docker exec intrack-backend node -p "require('pi-site-backend-2fa-module/package.json').version"
+
+Остання команда має вивести 0.2.4. Перевірити health сайту та позитивний і
+негативний OTP/challenge-response сценарії. Для цього оновлення не
+перезбирати й не перезапускати базу даних.
+
+CC338 У БРАУЗЕРІ
+Після етапу 3 встановити локальний агент підпису на клієнтській машині/VM.
+Потрібні vendor PKCS#11 library, PC/SC, довірений сертифікат сайту й точний
+origin сайту в allowlist агента. OTP не вимагає агента. Після сну носій треба
+переініціалізувати за інструкцією; не лишати його постійно активним.
+
+TROUBLESHOOTING
+- Пакет не знайдено: перевірити ім'я архіву, backend/package.json та те, що
+  архів лежить усередині Docker build context backend.
+- У контейнері стара версія: перебудувати образ і пересоздати лише backend;
+  перевірити версію командою вище.
+- UNKNOWN_USER / NO_TOKEN: перевірити realm, resolver, користувача та serial;
+  не просити вводити OTP повторно для помилки зіставлення.
+- Підпис правильний, але сесії немає: перевірити збережений сервером
+  transaction ID, строк pending login, serial і token type.
+- Агент не бачить CC338: перевірити USB passthrough VM, PC/SC, vendor module
+  і стан носія. Не встановлювати драйвер токена на host замість VM.
+- Не передавати в браузер PI URL, API key, transaction ID, PIN або seed.
+
+ПОВНІ ДОКУМЕНТИ
+docs/installation-sequence.uk.md — усі етапи, передумови, результати,
+відновлення й наскрізний troubleshooting.
+docs/integration-contract.md та docs/integration-contract.uk.md — API контракт.
+Адаптер не реалізує доменний SSO, Windows Credential Provider або PAM.
